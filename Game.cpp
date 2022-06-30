@@ -1,67 +1,47 @@
 #include "Game.hpp"
 
-Game::Game(): m_window("Part 2", sf::Vector2u(800, 600))
+Game::Game(): m_window("added event manager", sf::Vector2u(800, 600))
 {
     RestartClock();
-    srand(time(NULL));
+    srand(time(nullptr));
     
-    m_mushroomTexture.loadFromFile("mushroom.png");
-    m_mushroom.setTexture(m_mushroomTexture);
-    m_increment = sf::Vector2i(400,400);
+    m_texture.loadFromFile("mushroom.png");
+    m_sprite.setTexture(m_texture);
+    m_sprite.setOrigin(m_texture.getSize().x/2, m_texture.getSize().y/2);
+    m_sprite.setPosition(m_texture.getSize().x/2, m_texture.getSize().y/2);
+
+    m_window.GetEventManager()->AddCallback("Move", &Game::MoveSprite, this);
 }
 Game::~Game(){}
-
-sf::Time Game::GetElapsed()
-{
-    return m_elapsed;
-}
-void Game::RestartClock()
-{
-    m_elapsed = m_clock.restart();
-}
-Window* Game::GetWindow()
-{
-    return &m_window;
-}
-
-void Game::HandleInput()
-{
-    // Input handling
-}
 
 void Game::Update()
 {
     m_window.Update();
-    MoveMushroom();
 }
-void Game::MoveMushroom()
-{
-    sf::Vector2u l_windSize = m_window.GetWindowSize();
-    sf::Vector2u l_textSize = m_mushroomTexture.getSize();
-
-    if((m_mushroom.getPosition().x > 
-        l_windSize.x - l_textSize.x && m_increment.x > 0) || 
-        (m_mushroom.getPosition().x < 0 && m_increment.x < 0)) {
-        m_increment.x = -m_increment.x;
-    }
-
-    if((m_mushroom.getPosition().y > 
-        l_windSize.y - l_textSize.y && m_increment.y > 0) || 
-        (m_mushroom.getPosition().y < 0 && m_increment.y < 0)) {
-        m_increment.y = -m_increment.y;
-    }
-
-    float fElapsed = m_elapsed.asSeconds();
-
-    m_mushroom.setPosition(
-        m_mushroom.getPosition().x + (m_increment.x * fElapsed),
-        m_mushroom.getPosition().y + (m_increment.y * fElapsed)
-        );
-}
-
 void Game::Render()
 {
     m_window.BeginDraw();
-    m_window.Draw(m_mushroom);
+    m_window.GetRenderWindow()->draw(m_sprite);
     m_window.EndDraw();
+}
+
+sf::Time Game::GetElapsed()
+{
+    return Clock.getElapsedTime();
+}
+void Game::RestartClock()
+{
+    Clock.restart();
+}
+
+void Game::MoveSprite(EventDetails* l_details)
+{
+    sf::Vector2i mousepos = m_window.GetEventManager()->GetMousePos(m_window.GetRenderWindow());
+    m_sprite.setPosition(mousepos.x, mousepos.y);
+    std::cout << "Moving sprite to: " << mousepos.x << ":" << mousepos.y << std::endl; 
+}
+
+Window* Game::GetWindow()
+{
+    return &m_window;
 }

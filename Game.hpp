@@ -1,32 +1,26 @@
 #pragma once
-#include <string>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
 #include "Window.hpp"
+#include "EventManager.hpp"
+#include <iostream>
 
 class Game {
     public:
         Game();
         ~Game();
 
-        void HandleInput();
         void Update();
         void Render();
-
-        Window* GetWindow();
 
         sf::Time GetElapsed();
         void RestartClock();
 
+        void MoveSprite(EventDetails* l_details);
+        
+        Window* GetWindow();
     private:
-        void MoveMushroom();
-
         Window m_window;
+        sf::Clock Clock;
 
-        sf::Clock m_clock;
-        sf::Time m_elapsed;
-
-        sf::Texture m_mushroomTexture;
-        sf::Sprite m_mushroom;
-        sf::Vector2i m_increment;
+        sf::Texture m_texture;
+        sf::Sprite m_sprite;
 };
