@@ -1,26 +1,27 @@
 #pragma once
 #include "Window.hpp"
 #include "EventManager.hpp"
+#include "StateManager.hpp"
+#include "SharedContext.hpp"
 #include <iostream>
 
-class Game {
-    public:
-        Game();
-        ~Game();
+class Game{
+public:
+	Game();
+	~Game();
 
-        void Update();
-        void Render();
+	void Update();
+	void Render();
+	void LateUpdate();
 
-        sf::Time GetElapsed();
-        void RestartClock();
+	sf::Time GetElapsed();
 
-        void MoveSprite(EventDetails* l_details);
-        
-        Window* GetWindow();
-    private:
-        Window m_window;
-        sf::Clock Clock;
-
-        sf::Texture m_texture;
-        sf::Sprite m_sprite;
+	Window* GetWindow();
+private:
+	SharedContext m_context;
+	Window m_window;
+	StateManager m_stateManager;
+	sf::Clock m_clock;
+	sf::Time m_elapsed;
+	void RestartClock();
 };

@@ -5,39 +5,36 @@
 #include <SFML/Graphics.hpp>
 #include "EventManager.hpp"
 
+class Window{
+public:
+	Window();
+	Window(const std::string& title, const sf::Vector2u& size);
+	~Window();
 
-class Window {
-    public:
-        Window();
-        Window(const std::string& title, const sf::Vector2u& size);
-        ~Window();
+	void BeginDraw();
+	void EndDraw();
 
-        void BeginDraw();
-        void EndDraw();
+	void Update();
 
-        void Update();
+	bool IsDone();
+	bool IsFullscreen();
+	bool IsFocused();
 
-        bool IsDone();
-        bool IsFullscreen();
-        bool IsFocused();
+	void ToggleFullscreen(EventDetails* l_details);
+	void Close(EventDetails* l_details = nullptr);
 
-        void ToggleFullscreen(EventDetails* l_details);
-        void Close(EventDetails* l_details = nullptr);
+	sf::RenderWindow* GetRenderWindow();
+	EventManager* GetEventManager();
+	sf::Vector2u GetWindowSize();
+private:
+	void Setup(const std::string& title, const sf::Vector2u& size);
+	void Create();
 
-        sf::RenderWindow* GetRenderWindow();
-        EventManager* GetEventManager();
-        sf::Vector2u GetWindowSize();
-    
-    private:
-        void Setup(const std::string title, const sf::Vector2u& size);
-        void Create();
-        void Destroy();
-
-        sf::RenderWindow m_window;
-        EventManager m_eventManager;
-        sf::Vector2u m_windowSize;
-        std::string m_windowTitle;
-        bool m_isDone;
-        bool m_isFullscreen;
-        bool m_isFocused;
+	sf::RenderWindow m_window;
+	EventManager m_eventManager;
+	sf::Vector2u m_windowSize;
+	std::string m_windowTitle;
+	bool m_isDone;
+	bool m_isFullscreen;
+	bool m_isFocused;
 };

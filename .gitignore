@@ -3,3 +3,5 @@
 sample/
 history*
 .vscode
+*.ttf
+intro.png

@@ -1,10 +1,14 @@
 #include "EventManager.hpp"
 
-EventManager::EventManager(): m_hasFocus(true){ LoadBindings(); }
+EventManager::EventManager()
+	:m_currentState(StateType(0)), m_hasFocus(true)
+{
+	LoadBindings();
+}
+
 EventManager::~EventManager(){
 	for (auto &itr : m_bindings){
 		delete itr.second;
-		itr.second = nullptr;
 	}
 }
 
@@ -14,12 +18,17 @@ bool EventManager::AddBinding(Binding *l_binding){
 
 	return m_bindings.emplace(l_binding->m_name, l_binding).second;
 }
+
 bool EventManager::RemoveBinding(std::string l_name){
 	auto itr = m_bindings.find(l_name);
 	if (itr == m_bindings.end()){ return false; }
 	delete itr->second;
 	m_bindings.erase(itr);
 	return true;
+}
+
+void EventManager::SetCurrentState(StateType l_state){
+	m_currentState = l_state;
 }
 
 void EventManager::SetFocus(const bool& l_focus){ m_hasFocus = l_focus; }
@@ -92,15 +101,29 @@ void EventManager::Update(){
 				}
 			break;
 			case(EventType::Joystick) :
-				// todo.
+				// todo
 				break;
 			}
 		}
 
 		if (bind->m_events.size() == bind->c){
-			auto callItr = m_callbacks.find(bind->m_name);
-			if(callItr != m_callbacks.end()){
-				callItr->second(&bind->m_details);
+			auto stateCallbacks = m_callbacks.find(m_currentState);
+			auto otherCallbacks = m_callbacks.find(StateType(0));
+
+			if (stateCallbacks != m_callbacks.end()){
+				auto callItr = stateCallbacks->second.find(bind->m_name);
+				if (callItr != stateCallbacks->second.end()){
+					// Pass in information about events.
+					callItr->second(&bind->m_details);
+				}
+			}
+
+			if (otherCallbacks != m_callbacks.end()){
+				auto callItr = otherCallbacks->second.find(bind->m_name);
+				if (callItr != otherCallbacks->second.end()){
+					// Pass in information about events.
+					callItr->second(&bind->m_details);
+				}
 			}
 		}
 		bind->c = 0;
@@ -129,9 +152,9 @@ void EventManager::LoadBindings(){
 			EventType type = EventType(stoi(keyval.substr(start, end - start)));
 			int code = stoi(keyval.substr(end + delimiter.length(),
 				keyval.find(delimiter, end + delimiter.length())));
+
 			EventInfo eventInfo;
 			eventInfo.m_code = code;
-
 			bind->BindEvent(type, eventInfo);
 		}
 
